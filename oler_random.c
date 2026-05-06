@@ -1,7 +1,7 @@
 #include<stdint.h>
 #include<assert.h>
 
-// algorithm taken from Wikipedia, Xorshift64
+// algorithm taken from Wikipedia Xorshift64 Xorshiro256**
 #define oler_XORSHIFT_MAX_VALUE (~0ull)
 typedef struct {
 	uint64_t n;
@@ -15,14 +15,9 @@ uint64_t oler_xorshift_next(oler_XorShiftState* state) {
 	return state->n = x;
 }
 
-double oler_xorshift_next_double(oler_XorShiftState* state) {
-	uint64_t x = oler_xorshift_next(state);
-	return (x-1)/oler_XORSHIFT_MAX_VALUE;
-}
-
 oler_XorShiftState global_random_state;
 
-void oler_random_set_seed(uint64_t seed) {
+void oler_random_seed(uint64_t seed) {
 	global_random_state.n = seed;
 }
 
@@ -43,7 +38,7 @@ int64_t oler_randint(int64_t a, int64_t b) {
 
 double oler_random_double() { // between 0. and 1.
 	uint64_t x = oler_xorshift_next(&global_random_state);
-	return (x-1)/oler_XORSHIFT_MAX_VALUE;
+	return (x-1)/(double)oler_XORSHIFT_MAX_VALUE;
 }
 
 void oler_random_bytes(size_t len, uint8_t buffer[len]) {
