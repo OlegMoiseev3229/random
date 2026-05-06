@@ -1,4 +1,5 @@
 #include<stdint.h>
+#include<assert.h>
 
 // algorithm taken from Wikipedia, Xorshift64
 #define oler_XORSHIFT_MAX_VALUE (~0ull)
@@ -17,4 +18,57 @@ uint64_t oler_xorshift_next(oler_XorShiftState* state) {
 double oler_xorshift_next_double(oler_XorShiftState* state) {
 	uint64_t x = oler_xorshift_next(state);
 	return (x-1)/oler_XORSHIFT_MAX_VALUE;
+}
+
+oler_XorShiftState global_random_state;
+
+void oler_random_set_seed(uint64_t seed) {
+	global_random_state.n = seed;
+}
+
+uint64_t oler_randuint(uint64_t a, uint64_t b) {
+	assert(b > a);
+	uint64_t x = oler_xorshift_next(&global_random_state);
+	x %= b-a;
+	return a + x;
+}
+
+int64_t oler_randint(int64_t a, int64_t b) {
+	assert(b > a);
+	uint64_t x = oler_xorshift_next(&global_random_state);
+	int64_t x_signed = *(int64_t *)&x;
+	x_signed %= b-a;
+	return a + x_signed;
+}
+
+double oler_random_double() { // between 0. and 1.
+	uint64_t x = oler_xorshift_next(&global_random_state);
+	return (x-1)/oler_XORSHIFT_MAX_VALUE;
+}
+
+void oler_random_bytes(size_t len, uint8_t buffer[len]) {
+	for (size_t bytes_written = 0; bytes_written < len;) {
+		uint64_t x =  oler_xorshift_next(&global_random_state);
+		switch (len - bytes_written) {
+		case 3:
+			buffer[bytes_written++] = x & 0xFF;
+			x >>= 8;
+		case 2:
+			buffer[bytes_written++] = x & 0xFF;
+			x >>= 8;
+		case 1:
+			buffer[bytes_written++] = x & 0xFF;
+			x >>= 8;
+			break;
+		default:
+			buffer[bytes_written++] = x & 0xFF;
+			x >>= 8;
+			buffer[bytes_written++] = x & 0xFF;
+			x >>= 8;
+			buffer[bytes_written++] = x & 0xFF;
+			x >>= 8;
+			buffer[bytes_written++] = x & 0xFF;
+			x >>= 8;
+		}
+	}
 }
