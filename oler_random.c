@@ -56,6 +56,14 @@ double oler_random_exponential(double lambda) {
 	return -((log(1 - p))/(lambda));
 }
 
+double oler_random_normal(double mu, double sigma) { 
+	double u = oler_random_double();
+	double v = oler_random_double();
+
+	double x = sqrt(-2 * log(u)) * cos(2*M_PI * v);
+	return mu + sigma*x;
+}
+
 void oler_random_bytes(size_t len, uint8_t buffer[len]) {
 	for (size_t bytes_written = 0; bytes_written < len;) {
 		uint64_t x =  oler_xorshift_next(&global_random_state);
