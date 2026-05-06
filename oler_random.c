@@ -1,5 +1,6 @@
 #include<stdint.h>
 #include<assert.h>
+#include<math.h>
 
 // algorithm taken from Wikipedia Xorshift64 Xorshiro256**
 #define oler_XORSHIFT_MAX_VALUE (~0ull)
@@ -41,6 +42,20 @@ double oler_random_double() { // between 0. and 1.
 	return (x-1)/(double)oler_XORSHIFT_MAX_VALUE;
 }
 
+double oler_random_bernoulli(double p) {
+	return (oler_random_double() < p) ? 1. : 0.;
+}
+
+double oler_random_pareto(double alpha, double x_min) { 
+	double p = oler_random_double();
+	return x_min * pow(1. - p, -1./alpha);
+}
+
+double oler_random_exponential(double lambda) { 
+	double p = oler_random_double();
+	return -((log(1 - p))/(lambda));
+}
+
 void oler_random_bytes(size_t len, uint8_t buffer[len]) {
 	for (size_t bytes_written = 0; bytes_written < len;) {
 		uint64_t x =  oler_xorshift_next(&global_random_state);
@@ -67,3 +82,4 @@ void oler_random_bytes(size_t len, uint8_t buffer[len]) {
 		}
 	}
 }
+
