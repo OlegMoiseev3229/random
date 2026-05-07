@@ -1,5 +1,6 @@
 #include<stdio.h>
-#include "oler_random.c"
+#define OLER_RANDOM_IMPLEMENTATION
+#include "oler_random.h"
 
 int main() {
 	oler_random_seed(42);
