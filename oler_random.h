@@ -22,6 +22,7 @@ double oler_random_pareto(double alpha, double x_min);
 double oler_random_exponential(double lambda);
 double oler_random_normal(double mu, double sigma);
 void oler_random_bytes(size_t len, uint8_t buffer[len]);
+void oler_random_bits(size_t len, uint8_t buffer[len], double p); // p is the probability of a bit being 1
 
 #ifdef OLER_RANDOM_IMPLEMENTATION
 
@@ -132,6 +133,20 @@ void oler_random_bytes(size_t len, uint8_t buffer[len]) {
 			buffer[bytes_written++] = x & 0xFF;
 			x >>= 8;
 		}
+	}
+}
+
+void oler_random_bits(size_t len, uint8_t buffer[len], double p) {
+	for (size_t i = 0; i < len; i++) {
+		uint8_t byte = 0;
+		for (int j = 0; j < 8; j++) {
+			byte <<= 1;
+			double x = oler_random_double();
+			if (x < p) {
+				byte |= 1;
+			}
+		}
+		buffer[i] = byte;
 	}
 }
 #endif
